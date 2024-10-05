@@ -9,17 +9,36 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (password.length < 4) {
-      alert('Password must be at least 4 characters long.');
+      setError('Password must be at least 4 characters long.');
       return;
     }
 
     if (username && password) {
-      localStorage.setItem('user', JSON.stringify({ username }));
-      navigate('/main'); 
+      try {
+
+        const response = await fetch(`https://66e7e6bbb17821a9d9da704c.mockapi.io/home?search=${username}`);
+        const data = await response.json();
+
+        if (data.length === 0) {
+          setError('Account does not exist. Please register.');
+          return;
+        }
+
+        
+        const user = data.find((user) => user.username === username);
+        if (user && user.password === password) {
+          localStorage.setItem('user', JSON.stringify({ username }));
+          navigate('/main');
+        } else {
+          setError('Invalid password. Please try again.');
+        }
+      } catch (err) {
+        setError('Failed to login. Please try again.');
+      }
     } else {
-      setError('Please enter a valid username and password');
+      setError('Please enter a valid username and password.');
     }
   };
 
@@ -35,7 +54,7 @@ export default function LoginPage() {
           placeholder="اسم المستخدم"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-3 mb-4 bg-gray-700 rounded-md text-right text-white  focus:outline-none"
+          className="w-full p-3 mb-4 bg-gray-700 rounded-md text-right text-white focus:outline-none"
         />
 
         <input
@@ -48,13 +67,21 @@ export default function LoginPage() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-blue-500 text-white py-2  rounded-md hover:bg-blue-600 transition-colors"
+          className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
         >
           تسجيل الدخول
         </button>
+
+        <p className="text-center mt-4">
+          ليس لديك حساب؟{' '}
+          <span
+            onClick={() => navigate('/register')}
+            className="text-blue-500 cursor-pointer hover:underline"
+          >
+            سجل الآن
+          </span>
+        </p>
       </div>
     </div>
   );
 }
-
-
