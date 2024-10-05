@@ -47,8 +47,7 @@ import { useState } from 'react';
 
 function Layout({ children, handleSearch }) {
   const location = useLocation();
-
-  // Render the Navbar on all pages except for the Login and Register pages
+sh
   return (
     <>
       {location.pathname !== '/' && location.pathname !== '/register' && (
